@@ -1,59 +1,129 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[DefaultExecutionOrder(-1)]
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Components")]
-    [SerializeField] private Rigidbody _rigidbody;
-    [SerializeField] private Camera _playerCamera;
+    [Header("Movement")]
+    public float moveSpeed;
 
-    [Header("Base Movement")]
-    public float runAcceleration = 50f;
-    public float runSpeed = 4f;
-    public float drag = 20f;
+    public float groundDrag;
 
-    [Header("Camera Settings")]
-    public float lookSenseH = 0.1f;
-    public float lookSenseV = 0.1f;
-    public float lookLimitV = 89f;
+    public float jumpForce;
+    public float jumpCooldown;
+    public float airMultiplier;
+    public float landingGravityMultiplier;
+    bool readyToJump;
 
-    private PlayerInput _playerLocomotionInput;
-    private Vector2 _cameraRotation = Vector2.zero;
-    private Vector2 _playerTargetRotation = Vector2.zero;
+    [Header("Keybinds")]
+    public KeyCode jumpKey = KeyCode.Space;
 
-    private void Awake()
+    [Header("Ground Check")]
+    public float playerHeight;
+    public LayerMask whatIsGround;
+    public bool grounded;
+
+    public Transform orientation;
+
+    float horizontalInput;
+    float verticalInput;
+
+    Vector3 moveDirection;
+    Rigidbody rb;
+
+    void Start()
     {
-        _playerLocomotionInput = GetComponent<PlayerInput>();
-        _rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        readyToJump = true;
     }
 
-    private void Update()
+    void Update()
     {
-        Vector3 cameraForwardXZ = new Vector3(_playerCamera.transform.forward.x, 0f, _playerCamera.transform.forward.z).normalized;
-        Vector3 cameraRightXZ = new Vector3(_playerCamera.transform.right.x, 0f, _playerCamera.transform.right.z).normalized;
-        Vector3 movementDirection = cameraRightXZ * _playerLocomotionInput.MovementInput.x + cameraForwardXZ * _playerLocomotionInput.MovementInput.y;
+        // Calculate the center position (middle of the player)
+        Vector3 rayOrigin = transform.position + Vector3.up * (playerHeight * 0.5f);
 
-        Vector3 movementDelta = movementDirection * runAcceleration * Time.deltaTime;
-        Vector3 newVelocity = _rigidbody.linearVelocity + movementDelta;
+        // ground check
+        grounded = Physics.Raycast(rayOrigin, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
-        // Add drag to player
-        Vector3 currentDrag = newVelocity.normalized * drag * Time.deltaTime;
-        newVelocity = (newVelocity.magnitude > drag * Time.deltaTime) ? newVelocity - currentDrag : Vector3.zero;
-        newVelocity = Vector3.ClampMagnitude(newVelocity, runSpeed);
+        // Debug: Show current speed in the Console
+        Debug.Log("Current Speed: " + rb.linearVelocity.magnitude);
 
-        // Apply the new velocity to the Rigidbody
-        _rigidbody.linearVelocity = newVelocity;
+        MyInput();
+        SpeedControl();
+
+        // handle drag
+        if (grounded)
+        {
+            rb.linearDamping = groundDrag;
+        }
+        else
+        {
+            rb.linearDamping = groundDrag * 0.5f; // Use some drag in air for control
+        }
     }
 
-    private void LateUpdate()
+    void FixedUpdate()
     {
-        _cameraRotation.x += lookSenseH * _playerLocomotionInput.LookInput.x;
-        _cameraRotation.y = Mathf.Clamp(_cameraRotation.y - lookSenseV * _playerLocomotionInput.LookInput.y, -lookLimitV, lookLimitV);
+        MovePlayer();
+    }
 
-        _playerTargetRotation.x += transform.eulerAngles.x + lookSenseH * _playerLocomotionInput.LookInput.x;
-        transform.rotation = Quaternion.Euler(0f, _playerTargetRotation.x, 0f);
+    private void MyInput()
+    {
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
 
-        _playerCamera.transform.rotation = Quaternion.Euler(_cameraRotation.y, _cameraRotation.x, 0f);
+        // when to jump
+        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        {
+            readyToJump = false;
+            Jump();
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+
+    private void MovePlayer()
+    {
+        // calculate movement direction
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        // on ground
+        if (grounded)
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.VelocityChange);
+        }
+        // in air
+        else
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * airMultiplier, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.down * landingGravityMultiplier, ForceMode.Acceleration); // Use Acceleration for gravity
+        }
+    }
+
+    private void SpeedControl()
+    {
+        // limit velocity
+        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+        if (flatVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rb.linearVelocity = new Vector3(limitedVel.x, rb.linearVelocity.y, limitedVel.z);
+        }
+    }
+
+    private void Jump()
+    {
+        // reset y velocity
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+        // jump
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private void ResetJump()
+    {
+        readyToJump = true;
     }
 }
