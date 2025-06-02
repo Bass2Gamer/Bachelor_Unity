@@ -3,41 +3,35 @@ using UnityEngine;
 public class PlayerAnimation : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-
     private PlayerMovement _playerMovement;
     private Rigidbody _rb;
 
-    private static int inputXHash = Animator.StringToHash("inputX");
-    private static int inputYHash = Animator.StringToHash("inputY");
-    private static int isJumpingHash = Animator.StringToHash("isJumping");
-    private static int isFallingHash = Animator.StringToHash("isFalling");
-    private static int isGroundedHash = Animator.StringToHash("isGrounded");
+    private static readonly int isMovingHash = Animator.StringToHash("isMoving");
+    private static readonly int drawWeaponHash = Animator.StringToHash("drawWeapon");
+    private static readonly int sheathWeaponHash = Animator.StringToHash("sheathWeapon");
+    private static readonly int speedHash = Animator.StringToHash("speed");
+    private static readonly int attackHash = Animator.StringToHash("attack");
+    private static readonly int moveHash = Animator.StringToHash("move");
 
-    private void Awake()
+    public Animator Animator => _animator;
+
+    void Awake()
     {
         _playerMovement = GetComponent<PlayerMovement>();
         _rb = GetComponent<Rigidbody>();
     }
 
-    private void Update()
-    {
-        UpdateAnimationState();
-    }
+    void Update() => UpdateAnimationState();
 
     private void UpdateAnimationState()
     {
-        float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
-
-        _animator.SetFloat(inputXHash, inputX);
-        _animator.SetFloat(inputYHash, inputY);
-
-        bool isGrounded = _playerMovement.grounded;
-        bool isJumping = !isGrounded && _rb.linearVelocity.y > 0.1f;
-        bool isFalling = !isGrounded && _rb.linearVelocity.y < -0.1f;
-
-        _animator.SetBool(isGroundedHash, isGrounded);
-        _animator.SetBool(isJumpingHash, isJumping);
-        _animator.SetBool(isFallingHash, isFalling);
+        float speed = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z).magnitude;
+        _animator.SetFloat(speedHash, speed);
+        _animator.SetBool(isMovingHash, speed > 0.1f);
     }
+
+    public void TriggerDrawWeapon() => _animator.SetTrigger(drawWeaponHash);
+    public void TriggerSheathWeapon() => _animator.SetTrigger(sheathWeaponHash);
+    public void TriggerAttack() => _animator.SetTrigger(attackHash);
+    public void TriggerMove() => _animator.SetTrigger(moveHash);
 }

@@ -5,17 +5,12 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
-
     public float groundDrag;
-
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
     public float landingGravityMultiplier;
     bool readyToJump;
-
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -30,6 +25,23 @@ public class PlayerMovement : MonoBehaviour
     Vector3 moveDirection;
     Rigidbody rb;
 
+    private PlayerControls controls;
+    private Vector2 moveInput;
+    private bool jumpInput;
+    Animator animator;
+
+    void Awake()
+    {
+        controls = new PlayerControls();
+        controls.PlayerInput.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        controls.PlayerInput.Movement.canceled += ctx => moveInput = Vector2.zero;
+        controls.PlayerInput.Jump.performed += ctx => jumpInput = true;
+        controls.PlayerInput.Jump.canceled += ctx => jumpInput = false;
+    }
+
+    void OnEnable() => controls.PlayerInput.Enable();
+    void OnDisable() => controls.PlayerInput.Disable();
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -37,45 +49,31 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         readyToJump = true;
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        // Calculate the center position (middle of the player)
         Vector3 rayOrigin = transform.position + Vector3.up * (playerHeight * 0.5f);
-
-        // ground check
         grounded = Physics.Raycast(rayOrigin, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-
-        // Debug: Show current speed in the Console
-        Debug.Log("Current Speed: " + rb.linearVelocity.magnitude);
 
         MyInput();
         SpeedControl();
 
-        // handle drag
-        if (grounded)
-        {
-            rb.linearDamping = groundDrag;
-        }
-        else
-        {
-            rb.linearDamping = groundDrag * 0.5f; // Use some drag in air for control
-        }
+        animator?.SetFloat("speed", new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude);
+        animator?.SetBool("isGrounded", grounded);
+
+        rb.linearDamping = grounded ? groundDrag : groundDrag * 0.5f;
     }
 
-    void FixedUpdate()
-    {
-        MovePlayer();
-    }
+    void FixedUpdate() => MovePlayer();
 
     private void MyInput()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        horizontalInput = moveInput.x;
+        verticalInput = moveInput.y;
 
-        // when to jump
-        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        if (jumpInput && readyToJump && grounded)
         {
             readyToJump = false;
             Jump();
@@ -85,27 +83,20 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        // on ground
         if (grounded)
-        {
             rb.AddForce(moveDirection.normalized * moveSpeed, ForceMode.VelocityChange);
-        }
-        // in air
         else
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * airMultiplier, ForceMode.VelocityChange);
-            rb.AddForce(Vector3.down * landingGravityMultiplier, ForceMode.Acceleration); // Use Acceleration for gravity
+            rb.AddForce(Vector3.down * landingGravityMultiplier, ForceMode.Acceleration);
         }
     }
 
     private void SpeedControl()
     {
-        // limit velocity
         Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
         if (flatVel.magnitude > moveSpeed)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
@@ -115,15 +106,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        // reset y velocity
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
-        // jump
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        animator?.SetTrigger("jump");
     }
 
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
+    private void ResetJump() => readyToJump = true;
 }
