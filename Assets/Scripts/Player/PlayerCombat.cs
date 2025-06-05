@@ -3,8 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerCombat : MonoBehaviour
 {
-    private PlayerControls _controls;
-    private PlayerAnimation _playerAnimation;
+    private PlayerControls controls;
+    private PlayerAnimation playerAnimation;
     private bool weaponDrawn = false;
     private float timepassed;
     private float clipLength;
@@ -14,36 +14,36 @@ public class PlayerCombat : MonoBehaviour
 
     void Awake()
     {
-        _controls = new PlayerControls();
-        _playerAnimation = GetComponent<PlayerAnimation>();
+        controls = new PlayerControls();
+        playerAnimation = GetComponent<PlayerAnimation>();
     }
 
     void OnEnable()
     {
-        _controls.PlayerInput.DrawWeapon.performed += OnDrawWeapon;
-        _controls.PlayerInput.DrawWeapon.Enable();
-        _controls.PlayerInput.Attack.performed += OnAttack;
-        _controls.PlayerInput.Attack.Enable();
+        controls.PlayerInput.DrawWeapon.performed += OnDrawWeapon;
+        controls.PlayerInput.DrawWeapon.Enable();
+        controls.PlayerInput.Attack.performed += OnAttack;
+        controls.PlayerInput.Attack.Enable();
     }
 
     void OnDisable()
     {
-        _controls.PlayerInput.DrawWeapon.performed -= OnDrawWeapon;
-        _controls.PlayerInput.DrawWeapon.Disable();
-        _controls.PlayerInput.Attack.performed -= OnAttack;
-        _controls.PlayerInput.Attack.Disable();
+        controls.PlayerInput.DrawWeapon.performed -= OnDrawWeapon;
+        controls.PlayerInput.DrawWeapon.Disable();
+        controls.PlayerInput.Attack.performed -= OnAttack;
+        controls.PlayerInput.Attack.Disable();
     }
 
     void OnDrawWeapon(InputAction.CallbackContext context)
     {
         if (!weaponDrawn)
         {
-            _playerAnimation.TriggerDrawWeapon();
+            playerAnimation.TriggerDrawWeapon();
             weaponDrawn = true;
         }
         else
         {
-            _playerAnimation.TriggerSheathWeapon();
+            playerAnimation.TriggerSheathWeapon();
             weaponDrawn = false;
         }
     }
@@ -56,9 +56,9 @@ public class PlayerCombat : MonoBehaviour
         {
             attack = true;
             timepassed = 0f;
-            _playerAnimation.TriggerAttack();
-            _playerAnimation.Animator.SetFloat("speed", 0f);
-            _playerAnimation.Animator.applyRootMotion = true;
+            playerAnimation.TriggerAttack();
+            playerAnimation.Animator.SetFloat("speed", 0f);
+            playerAnimation.Animator.applyRootMotion = true;
             queuedAttack = false;
         }
         else
@@ -72,7 +72,7 @@ public class PlayerCombat : MonoBehaviour
         if (!attack) return;
 
         timepassed += Time.deltaTime;
-        var animator = _playerAnimation.Animator;
+        var animator = playerAnimation.Animator;
         if (animator.GetCurrentAnimatorClipInfoCount(1) > 0)
         {
             clipLength = animator.GetCurrentAnimatorClipInfo(1)[0].clip.length;
@@ -83,16 +83,16 @@ public class PlayerCombat : MonoBehaviour
                 {
                     attack = true;
                     timepassed = 0f;
-                    _playerAnimation.TriggerAttack();
-                    _playerAnimation.Animator.SetFloat("speed", 0f);
-                    _playerAnimation.Animator.applyRootMotion = true;
+                    playerAnimation.TriggerAttack();
+                    playerAnimation.Animator.SetFloat("speed", 0f);
+                    playerAnimation.Animator.applyRootMotion = true;
                     queuedAttack = false;
                 }
                 else
                 {
                     attack = false;
                     animator.applyRootMotion = false;
-                    _playerAnimation.TriggerMove();
+                    playerAnimation.TriggerMove();
                 }
             }
         }
