@@ -30,26 +30,66 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Movement"",
                     ""type"": ""Value"",
-                    ""id"": ""5a8347aa-4740-45a6-9e0e-8b4c5fc1d2d6"",
+                    ""id"": ""917163ba-e9e4-4ee6-9267-eca0fdf3cb70"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Look"",
-                    ""type"": ""Value"",
-                    ""id"": ""5835a2a9-3e32-4704-a572-7d11e08f7a45"",
-                    ""expectedControlType"": ""Vector2"",
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""e41b6829-d93a-4321-9eaf-411a12847cbb"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": true
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DrawWeapon"",
+                    ""type"": ""Button"",
+                    ""id"": ""1faa3ad0-b979-4903-8bf5-da3e2e6464a2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""d23e93a8-eb80-4830-a237-a8e3df0a75d2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
                 {
+                    ""name"": """",
+                    ""id"": ""6be013e1-5c87-4a19-a208-a042a28181dd"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DrawWeapon"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bf3c4409-5bd3-4604-9232-fd7056d3e409"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Tap"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
                     ""name"": ""WASD"",
-                    ""id"": ""38129077-495c-4d5d-b832-f0e10b0f9b1d"",
+                    ""id"": ""b73335ee-124c-40a0-aae7-f0b335c6b896"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -60,7 +100,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""e2577da3-e7a7-47e0-90e0-861df5399a91"",
+                    ""id"": ""66dd9ba0-acc4-40e9-bd7a-a0761d9896b5"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -71,7 +111,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""fb87e24e-324b-430f-8dc0-8f80affb56ae"",
+                    ""id"": ""a91b5a02-d1e7-42bc-bb34-371c70c909cc"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -82,7 +122,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""4c86eb01-aeb1-4593-8e85-38d81cd6bfa1"",
+                    ""id"": ""e3226199-3988-44e9-ae0a-f19b1c5941b5"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -93,7 +133,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""b4c0a611-2920-4c7c-880d-2faf2aa2db4d"",
+                    ""id"": ""5caa7286-5fb0-490b-83e2-35a242493e88"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -104,12 +144,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2d6fa488-b3ca-4328-b6e0-88e1dcc81c89"",
-                    ""path"": ""<Mouse>/delta"",
+                    ""id"": ""43223633-bdff-4185-9e8e-3f0408a11a17"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Look"",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -182,7 +222,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         // PlayerInput
         m_PlayerInput = asset.FindActionMap("PlayerInput", throwIfNotFound: true);
         m_PlayerInput_Movement = m_PlayerInput.FindAction("Movement", throwIfNotFound: true);
-        m_PlayerInput_Look = m_PlayerInput.FindAction("Look", throwIfNotFound: true);
+        m_PlayerInput_Jump = m_PlayerInput.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerInput_DrawWeapon = m_PlayerInput.FindAction("DrawWeapon", throwIfNotFound: true);
+        m_PlayerInput_Attack = m_PlayerInput.FindAction("Attack", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -250,13 +292,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_PlayerInput;
     private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
     private readonly InputAction m_PlayerInput_Movement;
-    private readonly InputAction m_PlayerInput_Look;
+    private readonly InputAction m_PlayerInput_Jump;
+    private readonly InputAction m_PlayerInput_DrawWeapon;
+    private readonly InputAction m_PlayerInput_Attack;
     public struct PlayerInputActions
     {
         private @PlayerControls m_Wrapper;
         public PlayerInputActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_PlayerInput_Movement;
-        public InputAction @Look => m_Wrapper.m_PlayerInput_Look;
+        public InputAction @Jump => m_Wrapper.m_PlayerInput_Jump;
+        public InputAction @DrawWeapon => m_Wrapper.m_PlayerInput_DrawWeapon;
+        public InputAction @Attack => m_Wrapper.m_PlayerInput_Attack;
         public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -269,9 +315,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Movement.started += instance.OnMovement;
             @Movement.performed += instance.OnMovement;
             @Movement.canceled += instance.OnMovement;
-            @Look.started += instance.OnLook;
-            @Look.performed += instance.OnLook;
-            @Look.canceled += instance.OnLook;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+            @DrawWeapon.started += instance.OnDrawWeapon;
+            @DrawWeapon.performed += instance.OnDrawWeapon;
+            @DrawWeapon.canceled += instance.OnDrawWeapon;
+            @Attack.started += instance.OnAttack;
+            @Attack.performed += instance.OnAttack;
+            @Attack.canceled += instance.OnAttack;
         }
 
         private void UnregisterCallbacks(IPlayerInputActions instance)
@@ -279,9 +331,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Movement.started -= instance.OnMovement;
             @Movement.performed -= instance.OnMovement;
             @Movement.canceled -= instance.OnMovement;
-            @Look.started -= instance.OnLook;
-            @Look.performed -= instance.OnLook;
-            @Look.canceled -= instance.OnLook;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+            @DrawWeapon.started -= instance.OnDrawWeapon;
+            @DrawWeapon.performed -= instance.OnDrawWeapon;
+            @DrawWeapon.canceled -= instance.OnDrawWeapon;
+            @Attack.started -= instance.OnAttack;
+            @Attack.performed -= instance.OnAttack;
+            @Attack.canceled -= instance.OnAttack;
         }
 
         public void RemoveCallbacks(IPlayerInputActions instance)
@@ -347,6 +405,8 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     public interface IPlayerInputActions
     {
         void OnMovement(InputAction.CallbackContext context);
-        void OnLook(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnDrawWeapon(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
     }
 }
