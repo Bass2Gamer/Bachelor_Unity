@@ -55,7 +55,12 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         Vector3 rayOrigin = transform.position + Vector3.up * (playerHeight * 0.5f);
-        grounded = Physics.Raycast(rayOrigin, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
+        float rayLength = playerHeight * 0.5f + 0.2f;
+        grounded = Physics.Raycast(rayOrigin, Vector3.down, rayLength, whatIsGround);
+
+        // Draw the ray in green if grounded, red if not
+        Color rayColor = grounded ? Color.green : Color.red;
+        Debug.DrawRay(rayOrigin, Vector3.down * rayLength, rayColor);
 
         MyInput();
         SpeedControl();
