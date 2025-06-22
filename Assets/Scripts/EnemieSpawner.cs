@@ -13,7 +13,7 @@ public class EnemieSpawner : MonoBehaviour
     private Transform[] spawnPoints;
     private float timer;
     private bool isSpawning = true;
-    private int currentEnemyCount = 0;
+    private int enemiesSpawnedTotal = 0;
 
     void Awake()
     {
@@ -35,9 +35,13 @@ public class EnemieSpawner : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
-            if (currentEnemyCount < maxEnemies)
+            if (enemiesSpawnedTotal < maxEnemies)
             {
                 SpawnEnemy();
+            }
+            else
+            {
+                isSpawning = false;
             }
             timer = spawnInterval;
         }
@@ -60,13 +64,7 @@ public class EnemieSpawner : MonoBehaviour
             enemy.transform.SetParent(enemiesContainer);
         }
 
-        currentEnemyCount++;
-
-    }
-
-    private void HandleEnemyDespawned()
-    {
-        currentEnemyCount = Mathf.Max(0, currentEnemyCount - 1);
+        enemiesSpawnedTotal++;
     }
 
     public void StartSpawning()
