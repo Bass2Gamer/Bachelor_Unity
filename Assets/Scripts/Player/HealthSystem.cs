@@ -5,7 +5,9 @@ using UnityEngine;
 public class HealthSystem : MonoBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] float health = 100;
+    [SerializeField] private float health = 100f;
+
+    public float CurrentHealth => health;
 
     void Start()
     {
@@ -28,4 +30,3 @@ public class HealthSystem : MonoBehaviour
         Destroy(this.gameObject);
     }
 }
- 
