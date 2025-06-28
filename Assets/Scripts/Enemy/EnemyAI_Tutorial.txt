@@ -1,0 +1,129 @@
+Enemy AI Tutorial
+===============================================
+
+Schritt 1: Spieler finden
+
+Wo: In der Start() Methode
+
+Ersetze das hier:
+// TODO: Player-Referenz finden (Tipp: GameObject.FindGameObjectWithTag("Player"))
+
+Mit diesem Code:
+player = GameObject.FindGameObjectWithTag("Player");
+
+Erklärung: FindGameObjectWithTag durchsucht alle Objekte in der Szene und gibt das erste Objekt zurück, das den Tag "Player" hat. Dieses speichern wir in der player Variable.
+
+===============================================
+
+Schritt 2: Entfernung messen
+
+Wo: In der Update() Methode
+
+Ersetze das hier:
+// TODO: Distanz zum Spieler berechnen (Tipp: Vector3.Distance)
+
+Mit diesem Code:
+float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+
+Erklärung: Vector3.Distance berechnet die Linie zwischen zwei Punkten im 3D-Raum. Wir vergleichen die Position des Spielers mit der Position des Gegners.
+
+===============================================
+
+Schritt 3: Zum Spieler schauen
+
+Wo: In der Update() Methode
+
+Ersetze das hier:
+// TODO: Gegner zum Spieler schauen lassen wenn in Reichweite (Tipp: transform.LookAt)
+
+Mit diesem Code:
+if (distanceToPlayer <= aggroRange)
+{
+    transform.LookAt(player.transform);
+}
+
+Erklärung: Die if-Bedingung prüft ob die Distanz kleiner oder gleich der aggroRange ist. transform.LookAt rotiert das Objekt so, dass es in Richtung des angegebenen Ziels schaut.
+
+===============================================
+
+Schritt 4: Distanz weitergeben
+
+Wo: In der Update() Methode
+
+Ändere diese beiden Zeilen:
+HandleAttack(0f); // Parameter durch berechnete Distanz ersetzen
+HandleChase(0f); // Parameter durch berechnete Distanz ersetzen
+
+Zu:
+HandleAttack(distanceToPlayer);
+HandleChase(distanceToPlayer);
+
+Erklärung: Methoden können Parameter entgegennehmen. Wir übergeben die berechnete Distanz an beide Methoden, damit sie diese Information verwenden können.
+
+===============================================
+
+Schritt 5: Angreifen programmieren
+
+Füge diese Variable oben unter den anderen Variablen ein:
+float attackTimer = 0f;
+
+Ersetze den ganzen HandleAttack Inhalt:
+private void HandleAttack(float distanceToPlayer)
+{
+    attackTimer += Time.deltaTime;
+    
+    if (attackTimer >= attackCD && distanceToPlayer <= attackRange)
+    {
+        enemyAnimator.TriggerAttack();
+        attackTimer = 0f;
+    }
+}
+
+Erklärung: Time.deltaTime ist die Zeit seit dem letzten Frame. Wir addieren diese zum Timer. Die if-Bedingung prüft zwei Dinge mit && (UND): Ist der Timer größer als der Cooldown UND ist der Spieler in Angriffsreichweite.
+
+===============================================
+
+Schritt 6: Verfolgen programmieren
+
+Füge diese Variable oben unter den anderen Variablen ein:
+float chaseTimer = 0f;
+
+Ersetze den ganzen HandleChase Inhalt:
+private void HandleChase(float distanceToPlayer)
+{
+    chaseTimer -= Time.deltaTime;
+    
+    if (chaseTimer <= 0 && distanceToPlayer <= aggroRange && distanceToPlayer > attackRange)
+    {
+        chaseTimer = 0.5f;
+        agent.SetDestination(player.transform.position);
+    }
+    
+    if (distanceToPlayer <= attackRange)
+    {
+        agent.SetDestination(transform.position);
+    }
+}
+
+Erklärung: Hier zählen wir den Timer runter mit -=. Die erste if-Bedingung hat drei Teile: Timer ist abgelaufen UND Spieler ist in Sichtweite UND Spieler ist nicht zu nah. SetDestination sagt dem NavMeshAgent wohin er laufen soll.
+
+===============================================
+
+Fertig!
+
+Wenn alles richtig gemacht wurde, sollte dein Gegner jetzt:
+- Den Spieler finden
+- Zum Spieler laufen
+- Den Spieler angreifen
+- Animationen abspielen
+
+Testen:
+- Starte das Spiel
+- Laufe in die Nähe des Gegners
+- Schaue ob er dich verfolgt und angreift
+
+Hilfe:
+Falls etwas nicht funktioniert:
+1. Prüfe die Konsole auf Fehlermeldungen
+2. Schaue ob alle Variablen richtig geschrieben sind
+3. Frag Uns
